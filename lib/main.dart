@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoice_generator/constants.dart';
 import 'package:invoice_generator/form.dart';
 
 void main() {
@@ -13,17 +14,33 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Invoice Generator',
-      theme: ThemeData.dark().copyWith(
-        primaryColor: const Color(0xFF0A0E21),
-        scaffoldBackgroundColor: const Color(0xFF0A0E21),
-        // focusColor: Colors.redAccent,
+      theme: ThemeData(
+        primaryColor: kred,
+        fontFamily: 'San Francisco',
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.redAccent,
-          elevation: 1,
+          backgroundColor: kred,
+          elevation: 0,
         ),
-        // colorScheme:
-        //     ColorScheme.fromSwatch().copyWith(secondary: Colors.redAccent),
       ),
+
+      // theme: ThemeData.light().copyWith(
+      //   primaryColor: Colors.redAccent,
+      //   appBarTheme: const AppBarTheme(
+      //     backgroundColor: Colors.redAccent,
+      //     elevation: 0,
+      //   ),
+      // ),
+
+      // theme: ThemeData.dark().copyWith(
+      //   primaryColor: const Color(0xFF0A0E21),
+      //   scaffoldBackgroundColor: const Color(0xFF0A0E21),
+      //   // focusColor: Colors.redAccent,
+      //   appBarTheme: const AppBarTheme(
+      //     backgroundColor: Colors.redAccent,
+      //     elevation: 1,
+      //   ),
+      // colorScheme:
+      //     ColorScheme.fromSwatch().copyWith(secondary: Colors.redAccent),
       home: const FormScreen(),
     );
   }

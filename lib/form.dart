@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoice_generator/constants.dart';
 
 class FormScreen extends StatefulWidget {
   const FormScreen({Key? key}) : super(key: key);
@@ -13,11 +14,17 @@ class _FormScreenState extends State<FormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Invoice Generator'),
+        title: const Text('Invoice Generator',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            )),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.folder, color: Colors.white),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.folder, color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -29,56 +36,108 @@ class _FormScreenState extends State<FormScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const TextField(
-                  style: TextStyle(
-                    fontSize: 20,
+                Container(
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: kLightGrey,
                   ),
-                  decoration: InputDecoration(
-                    isDense: true,
-                    contentPadding: EdgeInsets.all(10.0),
-                    hintText: "Parent's Name",
-                    border: OutlineInputBorder(),
+                  child: const Padding(
+                    padding: EdgeInsets.only(left: 8.0),
+                    child: TextField(
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.all(10.0),
+                        labelText: "Parent's Name",
+                        labelStyle: TextStyle(
+                          color: kblack,
+                        ),
+                        floatingLabelStyle: TextStyle(
+                          color: kblack,
+                        ),
+                        border: InputBorder.none,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(
                   height: spacing,
                 ),
                 Row(
-                  children: const [
+                  children: [
+                    // child's name field
                     Expanded(
-                      child: TextField(
-                        style: TextStyle(
-                          fontSize: 20,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          color: kLightGrey,
                         ),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.all(10.0),
-                          labelText: "Child's Name",
-                          hintText: "Child's Name",
-                          border: OutlineInputBorder(),
+                        child: const Padding(
+                          padding: EdgeInsets.only(left: 8.0),
+                          child: TextField(
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10.0),
+                              labelText: "Child's Name",
+                              labelStyle: TextStyle(
+                                color: kblack,
+                              ),
+                              floatingLabelStyle: TextStyle(
+                                color: kblack,
+                              ),
+                              border: InputBorder.none,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    // end of child's name field
+
+                    const SizedBox(
                       width: spacing,
                     ),
+
+                    // fee field
                     Expanded(
-                      child: TextField(
-                        style: TextStyle(
-                          fontSize: 20,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          color: kLightGrey,
                         ),
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.all(10.0),
-                          isDense: true,
-                          prefixText: 'NGN',
-                          prefixStyle: TextStyle(
-                            color: Colors.white,
+                        child: const Padding(
+                          padding: EdgeInsets.only(left: 8.0),
+                          child: TextField(
+                            keyboardType: TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10.0),
+                              isDense: true,
+                              prefixText: 'NGN ',
+                              // prefixStyle: TextStyle(
+                              //   color: kgrey,
+                              //   fontSize: 20,
+                              // ),
+                              labelText: "Fee",
+                              labelStyle: TextStyle(
+                                color: kblack,
+                              ),
+                              floatingLabelStyle: TextStyle(
+                                color: kblack,
+                              ),
+                              border: InputBorder.none,
+                            ),
                           ),
-                          labelText: "Fee",
-                          border: OutlineInputBorder(),
                         ),
                       ),
                     ),
+                    // end of fee field
                   ],
                 ),
 
@@ -93,17 +152,25 @@ class _FormScreenState extends State<FormScreen> {
                     onPressed: () {},
                     color: Colors.redAccent,
                     minWidth: 50,
+                    height: 40,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Center(
                       child: Row(
                         children: const [
-                          Icon(Icons.add),
+                          Icon(
+                            Icons.add,
+                            color: kwhite,
+                          ),
                           SizedBox(
                             width: 10,
                           ),
-                          Text('Add'),
+                          Text('Add',
+                              style: TextStyle(
+                                color: kwhite,
+                                fontSize: 20,
+                              )),
                         ],
                       ),
                     ),
@@ -114,27 +181,42 @@ class _FormScreenState extends State<FormScreen> {
                 const SizedBox(
                   height: spacing,
                 ),
+
+                // total paid field
                 Container(
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
-                    color: Colors.grey,
+                    color: kLightGrey,
                   ),
-                  child: TextFormField(
-                    keyboardType: const TextInputType.numberWithOptions(),
-                    style: const TextStyle(
-                      height: 0.7,
-                      fontSize: 20,
-                    ),
-                    decoration: const InputDecoration(
-                      isDense: true,
-                      contentPadding: EdgeInsets.all(10.0),
-                      labelText: 'Total Paid',
-                      // border: OutlineInputBorder(
-                      //   borderRadius: BorderRadius.all(Radius.circular(10)),
-                      // ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: TextFormField(
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: kblack,
+                      ),
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.all(10.0),
+                        prefixText: 'NGN ',
+                        labelText: 'Total Paid',
+                        labelStyle: TextStyle(
+                          color: kblack,
+                        ),
+                        floatingLabelStyle: TextStyle(
+                          color: kblack,
+                        ),
+                        border: InputBorder.none,
+                        // border: OutlineInputBorder(
+                        //   borderRadius: BorderRadius.all(Radius.circular(10)),
+                        // ),
+                      ),
                     ),
                   ),
                 ),
+                // end of total paid field
               ],
             ),
           ),
@@ -144,11 +226,12 @@ class _FormScreenState extends State<FormScreen> {
               minWidth: double.infinity,
               height: 70,
               elevation: 3,
-              color: Colors.redAccent,
+              color: kred,
               child: const Text(
                 'Generate Invoice',
                 style: TextStyle(
                   fontSize: 25,
+                  color: kwhite,
                   // fontWeight: FontWeight.bold,
                 ),
               ),

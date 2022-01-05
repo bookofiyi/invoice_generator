@@ -1,6 +1,6 @@
-# invoice_generator
+# Invoice Generator (Flutter)
 
-A new Flutter project.
+A mobile application, made with Flutter, for generating invoices for businesses.
 
 ## Getting Started
 
