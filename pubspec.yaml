@@ -77,18 +77,18 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Rota
-      fonts:
-        - asset: assets/fonts/Rota-Regular.otf
-        - asset: assets/fonts/Rota-Italic.otf
-          style: italic
-        - asset: assets/fonts/Rota-ExtraBold.otf
-    - family: DM Sans
-      fonts:
-        - asset: assets/fonts/DMSans-Regular.ttf
-        - asset: assets/fonts/DMSans-Bold.ttf
-        - asset: assets/fonts/DMSans-Italic.ttf
-          style: italic
+    # - family: Rota
+    #   fonts:
+    #     - asset: assets/fonts/Rota-Regular.otf
+    #     - asset: assets/fonts/Rota-Italic.otf
+    #       style: italic
+    #     - asset: assets/fonts/Rota-ExtraBold.otf
+    # - family: DM Sans
+    #   fonts:
+    #     - asset: assets/fonts/DMSans-Regular.ttf
+    #     - asset: assets/fonts/DMSans-Bold.ttf
+    #     - asset: assets/fonts/DMSans-Italic.ttf
+    #       style: italic
     - family: San Francisco
       fonts:
         - asset: assets/fonts/SF-Pro-Display-Regular.otf
