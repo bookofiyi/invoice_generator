@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:typed_data';
 import 'package:invoice_generator/constants.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'mobile.dart';
 // import 'package:invoice_generator/elements/child_field.dart';
 
 class FormScreen extends StatefulWidget {
@@ -10,7 +14,69 @@ class FormScreen extends StatefulWidget {
 
 class _FormScreenState extends State<FormScreen> {
   static const double spacing = 15;
+  final TextEditingController _parentName = TextEditingController();
+  String parentName = '';
+  final TextEditingController _childName = TextEditingController();
+  String childName = '';
+  final TextEditingController _fee = TextEditingController();
+  String fee = '';
+  final TextEditingController _totalPaid = TextEditingController();
+  String totalPaid = '';
   List<Widget> childrenFields = [];
+
+  // List<TextEditingController> childrenControllers = [];
+  // List<TextEditingController> feeControllers = [];
+
+  // void _addControllers() {
+  //   childrenControllers.add(TextEditingController());
+  //   feeControllers.add(TextEditingController());
+  // }
+
+  void showInSnackBar(context, String value) {
+    final snackBar = SnackBar(
+      content: Text(value),
+      backgroundColor: kred,
+      behavior: SnackBarBehavior.floating,
+      action: SnackBarAction(
+        label: 'DISMISS',
+        textColor: kwhite,
+        onPressed: () {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        },
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  Future<Uint8List> _readImageData(String name) async {
+    final data = await rootBundle.load('assets/images/$name');
+    return data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+  }
+
+  Future<void> _generateInvoice() async {
+    PdfDocument document = PdfDocument();
+    final page = document.pages.add();
+
+    page.graphics.drawImage(PdfBitmap(await _readImageData('logo.png')),
+        const Rect.fromLTWH(0, 0, 100, 100));
+
+    // Receipt text
+    page.graphics.drawString(
+        'Receipt', PdfStandardFont(PdfFontFamily.helvetica, 20),
+        bounds: const Rect.fromLTRB(440, 0, 0, 0));
+    // end of Receipt text
+
+    // Date Issued text
+    page.graphics.drawString(
+        '6th Jan, 2022', PdfStandardFont(PdfFontFamily.helvetica, 20),
+        bounds: const Rect.fromLTRB(390, 25, 0, 0));
+    // end of Date Issued text
+
+    List<int> bytes = document.save();
+    document.dispose();
+
+    saveAndLaunchFile(bytes, '$parentName.pdf');
+  }
 
   void _addChildField() {
     childrenFields.add(Padding(
@@ -140,6 +206,7 @@ class _FormScreenState extends State<FormScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: TextFormField(
+                          controller: _parentName,
                           style: const TextStyle(
                             fontSize: 20,
                           ),
@@ -154,6 +221,9 @@ class _FormScreenState extends State<FormScreen> {
                             ),
                             border: InputBorder.none,
                           ),
+                          onChanged: (value) {
+                            parentName = value;
+                          },
                         ),
                       ),
                     ),
@@ -175,6 +245,7 @@ class _FormScreenState extends State<FormScreen> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: TextFormField(
+                                controller: _childName,
                                 style: const TextStyle(
                                   fontSize: 20,
                                 ),
@@ -189,6 +260,9 @@ class _FormScreenState extends State<FormScreen> {
                                   ),
                                   border: InputBorder.none,
                                 ),
+                                // onChanged: (value) {
+                                //   childName = value;
+                                // },
                               ),
                             ),
                           ),
@@ -210,6 +284,7 @@ class _FormScreenState extends State<FormScreen> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: TextFormField(
+                                controller: _fee,
                                 cursorColor: kblack,
                                 keyboardType:
                                     const TextInputType.numberWithOptions(
@@ -235,6 +310,9 @@ class _FormScreenState extends State<FormScreen> {
                                   ),
                                   border: InputBorder.none,
                                 ),
+                                // onChanged: (value) {
+                                //   fee = value;
+                                // },
                               ),
                             ),
                           ),
@@ -305,6 +383,7 @@ class _FormScreenState extends State<FormScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: TextFormField(
+                          controller: _totalPaid,
                           cursorColor: kblack,
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
@@ -328,6 +407,9 @@ class _FormScreenState extends State<FormScreen> {
                             //   borderRadius: BorderRadius.all(Radius.circular(10)),
                             // ),
                           ),
+                          // onChanged: (value) {
+                          //   totalPaid = value;
+                          // },
                         ),
                       ),
                     ),
@@ -339,7 +421,16 @@ class _FormScreenState extends State<FormScreen> {
           ),
           Center(
             child: MaterialButton(
-              onPressed: () {},
+              onPressed: () {
+                if (_parentName.text.isEmpty ||
+                    _childName.text.isEmpty ||
+                    _fee.text.isEmpty ||
+                    _totalPaid.text.isEmpty) {
+                  showInSnackBar(context, 'Please fill in all the fields');
+                } else {
+                  _generateInvoice();
+                }
+              },
               minWidth: double.infinity,
               height: 70,
               elevation: 3,

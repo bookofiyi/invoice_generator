@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Invoice Generator',
       theme: ThemeData(
         primaryColor: kred,
+        primarySwatch: Colors.red,
         fontFamily: 'San Francisco',
         appBarTheme: const AppBarTheme(
           backgroundColor: kred,
