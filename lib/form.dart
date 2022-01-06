@@ -72,6 +72,13 @@ class _FormScreenState extends State<FormScreen> {
         bounds: const Rect.fromLTRB(390, 25, 0, 0));
     // end of Date Issued text
 
+    PdfGrid grid = PdfGrid();
+
+    grid.columns.add(count: 2);
+    grid.headers.add(1);
+
+    // PdfGridRow
+
     List<int> bytes = document.save();
     document.dispose();
 
