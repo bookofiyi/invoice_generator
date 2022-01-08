@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.invoice_generator">
    <application
-        android:label="invoice_generator"
+        android:label="Invoice Generator"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
