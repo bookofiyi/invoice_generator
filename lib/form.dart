@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/widgets.dart';
 import 'dart:typed_data';
 import 'package:invoice_generator/constants.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'mobile.dart';
+import 'package:jiffy/jiffy.dart';
 // import 'package:invoice_generator/elements/child_field.dart';
 
 class FormScreen extends StatefulWidget {
@@ -23,6 +25,12 @@ class _FormScreenState extends State<FormScreen> {
   final TextEditingController _totalPaid = TextEditingController();
   String totalPaid = '';
   List<Widget> childrenFields = [];
+  int? feeAsInt;
+  int? totalPaidAsInt;
+  int? totalFee;
+  int? outstanding;
+
+  String todayDate = '';
 
   // List<TextEditingController> childrenControllers = [];
   // List<TextEditingController> feeControllers = [];
@@ -61,23 +69,57 @@ class _FormScreenState extends State<FormScreen> {
         const Rect.fromLTWH(0, 0, 100, 100));
 
     // Receipt text
-    page.graphics.drawString(
-        'Receipt', PdfStandardFont(PdfFontFamily.helvetica, 20),
+    page.graphics.drawString('Receipt',
+        PdfStandardFont(PdfFontFamily.helvetica, 20, style: PdfFontStyle.bold),
         bounds: const Rect.fromLTRB(440, 0, 0, 0));
     // end of Receipt text
 
     // Date Issued text
     page.graphics.drawString(
-        '6th Jan, 2022', PdfStandardFont(PdfFontFamily.helvetica, 20),
-        bounds: const Rect.fromLTRB(390, 25, 0, 0));
+        todayDate, PdfStandardFont(PdfFontFamily.helvetica, 20),
+        bounds: const Rect.fromLTRB(395, 25, 0, 0));
     // end of Date Issued text
 
     PdfGrid grid = PdfGrid();
+    grid.style = PdfGridStyle(
+      font: PdfStandardFont(PdfFontFamily.helvetica, 20,
+          style: PdfFontStyle.bold),
+      cellPadding: PdfPaddings(left: 5, right: 2, top: 2, bottom: 2),
+    );
 
     grid.columns.add(count: 2);
     grid.headers.add(1);
 
-    // PdfGridRow
+    // header text
+    PdfGridRow header = grid.headers[0];
+    header.cells[0].value = _parentName.text;
+    // header.cells[1].value = '';
+
+    // ROW 1 (Child Name / Fee)
+    PdfGridRow row = grid.rows.add();
+    row.cells[0].value = _childName.text;
+    row.cells[1].value = 'NGN ${_fee.text}';
+    // row.cells[1].value = 'NGN 0';
+
+    // ROW 2 (Total Fee to be Paid)
+    row = grid.rows.add();
+    row.cells[0].value = 'Total';
+    row.cells[1].value = 'NGN ${_fee.text}';
+    // row.cells[1].value = 'NGN 0';
+
+    // ROW 3 (Amount Paid currently)
+    row = grid.rows.add();
+    row.cells[0].value = 'Amount Paid';
+    row.cells[1].value = 'NGN ${_totalPaid.text}';
+    // row.cells[1].value = 'NGN 0';
+
+    // ROW 4 (Outstanding currently)
+    row = grid.rows.add();
+    row.cells[0].value = 'Outstanding';
+    row.cells[1].value = 'NGN $outstanding';
+    // row.cells[1].value = 'NGN 0';
+
+    grid.draw(page: page, bounds: const Rect.fromLTWH(0, 150, 0, 0));
 
     List<int> bytes = document.save();
     document.dispose();
@@ -202,6 +244,7 @@ class _FormScreenState extends State<FormScreen> {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -267,9 +310,6 @@ class _FormScreenState extends State<FormScreen> {
                                   ),
                                   border: InputBorder.none,
                                 ),
-                                // onChanged: (value) {
-                                //   childName = value;
-                                // },
                               ),
                             ),
                           ),
@@ -293,10 +333,7 @@ class _FormScreenState extends State<FormScreen> {
                               child: TextFormField(
                                 controller: _fee,
                                 cursorColor: kblack,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                  decimal: true,
-                                ),
+                                keyboardType: TextInputType.number,
                                 style: const TextStyle(
                                   fontSize: 20,
                                 ),
@@ -304,10 +341,6 @@ class _FormScreenState extends State<FormScreen> {
                                   contentPadding: EdgeInsets.all(10.0),
                                   isDense: true,
                                   prefixText: 'NGN ',
-                                  // prefixStyle: TextStyle(
-                                  //   color: kgrey,
-                                  //   fontSize: 20,
-                                  // ),
                                   labelText: "Fee",
                                   labelStyle: TextStyle(
                                     color: kblack,
@@ -317,9 +350,9 @@ class _FormScreenState extends State<FormScreen> {
                                   ),
                                   border: InputBorder.none,
                                 ),
-                                // onChanged: (value) {
-                                //   fee = value;
-                                // },
+                                onChanged: (value) {
+                                  fee = value;
+                                },
                               ),
                             ),
                           ),
@@ -410,13 +443,10 @@ class _FormScreenState extends State<FormScreen> {
                               color: kblack,
                             ),
                             border: InputBorder.none,
-                            // border: OutlineInputBorder(
-                            //   borderRadius: BorderRadius.all(Radius.circular(10)),
-                            // ),
                           ),
-                          // onChanged: (value) {
-                          //   totalPaid = value;
-                          // },
+                          onChanged: (value) {
+                            totalPaid = value;
+                          },
                         ),
                       ),
                     ),
@@ -429,13 +459,27 @@ class _FormScreenState extends State<FormScreen> {
           Center(
             child: MaterialButton(
               onPressed: () {
+                if (_fee.text.isNotEmpty || _totalPaid.text.isNotEmpty) {
+                  feeAsInt = int.parse(fee);
+                  totalPaidAsInt = int.parse(totalPaid);
+                } else {
+                  showInSnackBar(context, 'Please fill in all the fields');
+                }
                 if (_parentName.text.isEmpty ||
                     _childName.text.isEmpty ||
                     _fee.text.isEmpty ||
                     _totalPaid.text.isEmpty) {
                   showInSnackBar(context, 'Please fill in all the fields');
                 } else {
-                  _generateInvoice();
+                  if (totalPaidAsInt! > feeAsInt!) {
+                    showInSnackBar(context,
+                        'Total Paid cannot be greater than total fees.');
+                  } else {
+                    totalFee = feeAsInt;
+                    outstanding = (totalFee! - totalPaidAsInt!);
+                    todayDate = Jiffy(DateTime.now()).format('do MMM yyyy');
+                    _generateInvoice();
+                  }
                 }
               },
               minWidth: double.infinity,
