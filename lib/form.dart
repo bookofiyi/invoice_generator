@@ -3,6 +3,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
 import 'dart:typed_data';
 import 'package:invoice_generator/constants.dart';
+import 'package:invoice_generator/elements/child_field.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'mobile.dart';
 import 'package:jiffy/jiffy.dart';
@@ -24,21 +25,12 @@ class _FormScreenState extends State<FormScreen> {
   String fee = '';
   final TextEditingController _totalPaid = TextEditingController();
   String totalPaid = '';
-  List<Widget> childrenFields = [];
   int? feeAsInt;
   int? totalPaidAsInt;
   int? totalFee;
   int? outstanding;
 
   String todayDate = '';
-
-  // List<TextEditingController> childrenControllers = [];
-  // List<TextEditingController> feeControllers = [];
-
-  // void _addControllers() {
-  //   childrenControllers.add(TextEditingController());
-  //   feeControllers.add(TextEditingController());
-  // }
 
   void showInSnackBar(context, String value) {
     final snackBar = SnackBar(
@@ -127,96 +119,112 @@ class _FormScreenState extends State<FormScreen> {
     saveAndLaunchFile(bytes, '$parentName.pdf');
   }
 
-  void _addChildField() {
-    childrenFields.add(Padding(
-      padding: const EdgeInsets.only(bottom: 15.0),
-      child: Row(
-        children: [
-          // child's name field
-          Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: kLightGrey,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: TextFormField(
-                  style: const TextStyle(
-                    fontSize: 20,
-                  ),
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.all(10.0),
-                    labelText: "Child's Name",
-                    labelStyle: TextStyle(
-                      color: kblack,
-                    ),
-                    floatingLabelStyle: TextStyle(
-                      color: kblack,
-                    ),
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          // end of child's name field
+  List<TextEditingController> childrenControllers = [];
+  List<TextEditingController> feeControllers = [];
+  List<Widget> childrenFields = [];
 
-          const SizedBox(
-            width: spacing,
-          ),
-
-          // fee field
-          Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: kLightGrey,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: TextFormField(
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  style: const TextStyle(
-                    fontSize: 20,
-                  ),
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.all(10.0),
-                    isDense: true,
-                    prefixText: 'NGN ',
-                    // prefixStyle: TextStyle(
-                    //   color: kgrey,
-                    //   fontSize: 20,
-                    // ),
-                    labelText: "Fee",
-                    labelStyle: TextStyle(
-                      color: kblack,
-                    ),
-                    floatingLabelStyle: TextStyle(
-                      color: kblack,
-                    ),
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          // end of fee field
-
-          IconButton(
-            onPressed: () {
-              setState(() {
-                childrenFields.removeLast();
-              });
-            },
-            icon: const Icon(Icons.cancel),
-          ),
-        ],
-      ),
-    ));
+  void _addControllers() {
+    childrenControllers.add(TextEditingController());
+    feeControllers.add(TextEditingController());
   }
+
+  void _addChildField() {
+    setState(() {
+      childrenFields.add(Container()); // adds an empty container to list
+    });
+    // Container is just a placeholder. It does nothing.
+    // It is basically just filling up the List to be able to keep count
+    // of number of elements in there.
+  }
+
+  // void _addChildField() {
+  //   childrenFields.add(Padding(
+  //     padding: const EdgeInsets.only(bottom: 15.0),
+  //     child: Row(
+  //       children: [
+  //         // child's name field
+  //         Expanded(
+  //           child: Container(
+  //             decoration: const BoxDecoration(
+  //               borderRadius: BorderRadius.all(Radius.circular(10)),
+  //               color: kLightGrey,
+  //             ),
+  //             child: Padding(
+  //               padding: const EdgeInsets.only(left: 8.0),
+  //               child: TextFormField(
+  //                 // controller: childrenControllers[],
+  //                 style: const TextStyle(
+  //                   fontSize: 20,
+  //                 ),
+  //                 decoration: const InputDecoration(
+  //                   contentPadding: EdgeInsets.all(10.0),
+  //                   labelText: "Child's Name",
+  //                   labelStyle: TextStyle(
+  //                     color: kblack,
+  //                   ),
+  //                   floatingLabelStyle: TextStyle(
+  //                     color: kblack,
+  //                   ),
+  //                   border: InputBorder.none,
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //         // end of child's name field
+
+  //         const SizedBox(
+  //           width: spacing,
+  //         ),
+
+  //         // fee field
+  //         Expanded(
+  //           child: Container(
+  //             decoration: const BoxDecoration(
+  //               borderRadius: BorderRadius.all(Radius.circular(10)),
+  //               color: kLightGrey,
+  //             ),
+  //             child: Padding(
+  //               padding: const EdgeInsets.only(left: 8.0),
+  //               child: TextFormField(
+  //                 // controller: ,
+  //                 keyboardType: const TextInputType.numberWithOptions(
+  //                   decimal: true,
+  //                 ),
+  //                 style: const TextStyle(
+  //                   fontSize: 20,
+  //                 ),
+  //                 decoration: const InputDecoration(
+  //                   contentPadding: EdgeInsets.all(10.0),
+  //                   isDense: true,
+  //                   prefixText: 'NGN ',
+  //                   labelText: "Fee",
+  //                   labelStyle: TextStyle(
+  //                     color: kblack,
+  //                   ),
+  //                   floatingLabelStyle: TextStyle(
+  //                     color: kblack,
+  //                   ),
+  //                   border: InputBorder.none,
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //         // end of fee field
+
+  //         IconButton(
+  //           onPressed: () {
+  //             setState(() {
+  //               childrenFields.removeLast();
+  //             });
+  //           },
+  //           icon: const Icon(Icons.cancel),
+  //         ),
+  //       ],
+  //     ),
+  //   ));
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -365,9 +373,35 @@ class _FormScreenState extends State<FormScreen> {
                       height: spacing,
                     ),
 
-                    Column(
-                      children: childrenFields,
-                    ),
+                    // what this should do is generate a list of fields
+                    // with a controllers for each field
+                    if (childrenFields.isNotEmpty)
+                      ListView.builder(
+                          padding: EdgeInsets.zero,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: childrenFields.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            TextEditingController _childNameController =
+                                childrenControllers[index];
+                            TextEditingController _feeController =
+                                feeControllers[index];
+                            return ChildField(
+                              childNameController: _childNameController,
+                              feeController: _feeController,
+                              currentChildField: childrenFields.removeAt(index),
+                              currentChildNameController:
+                                  childrenControllers.removeAt(index),
+                              currentFeeController:
+                                  feeControllers.removeAt(index),
+                            );
+                          })
+                    else
+                      Container(),
+
+                    // Column(
+                    //   children: childrenFields,
+                    // ),
 
                     const SizedBox(
                       height: spacing,
@@ -380,6 +414,7 @@ class _FormScreenState extends State<FormScreen> {
                         onPressed: () {
                           setState(() {
                             _addChildField();
+                            _addControllers();
                           });
                         },
                         color: Colors.redAccent,
