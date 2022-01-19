@@ -12,7 +12,7 @@ class ChildField extends StatefulWidget {
   }) : super(key: key);
   final TextEditingController childNameController;
   final TextEditingController feeController;
-  final Widget currentChildField;
+  final int currentChildField;
   final TextEditingController currentChildNameController;
   final TextEditingController currentFeeController;
 

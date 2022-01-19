@@ -3,11 +3,11 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
 import 'dart:typed_data';
 import 'package:invoice_generator/constants.dart';
-import 'package:invoice_generator/elements/child_field.dart';
+// import 'package:invoice_generator/elements/child_field.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'mobile.dart';
 import 'package:jiffy/jiffy.dart';
-// import 'package:invoice_generator/elements/child_field.dart';
+import 'package:quiver/iterables.dart';
 
 class FormScreen extends StatefulWidget {
   const FormScreen({Key? key}) : super(key: key);
@@ -19,16 +19,40 @@ class _FormScreenState extends State<FormScreen> {
   static const double spacing = 15;
   final TextEditingController _parentName = TextEditingController();
   String parentName = '';
-  final TextEditingController _childName = TextEditingController();
-  String childName = '';
-  final TextEditingController _fee = TextEditingController();
-  String fee = '';
+  // final TextEditingController _childName = TextEditingController();
+  // final TextEditingController _fee = TextEditingController();
   final TextEditingController _totalPaid = TextEditingController();
   String totalPaid = '';
   int? feeAsInt;
   int? totalPaidAsInt;
   int? totalFee;
   int? outstanding;
+
+  final List<TextEditingController> _childNameControllers = [
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController()
+  ];
+  // String childName1 = '';
+  // String childName2 = '';
+  // String childName3 = '';
+  // String childName4 = '';
+  //
+  final List<TextEditingController> _feeControllers = [
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController()
+  ];
+  String fee1 = '';
+  String fee2 = '';
+  String fee3 = '';
+  String fee4 = '';
+
+  List<int> allFeesAsInt = [];
+  Map<String, String>? nameAndFee;
+  int? totalExpected;
 
   String todayDate = '';
 
@@ -69,7 +93,7 @@ class _FormScreenState extends State<FormScreen> {
     // Date Issued text
     page.graphics.drawString(
         todayDate, PdfStandardFont(PdfFontFamily.helvetica, 20),
-        bounds: const Rect.fromLTRB(395, 25, 0, 0));
+        bounds: const Rect.fromLTRB(380, 25, 0, 0));
     // end of Date Issued text
 
     PdfGrid grid = PdfGrid();
@@ -89,14 +113,14 @@ class _FormScreenState extends State<FormScreen> {
 
     // ROW 1 (Child Name / Fee)
     PdfGridRow row = grid.rows.add();
-    row.cells[0].value = _childName.text;
-    row.cells[1].value = 'NGN ${_fee.text}';
+    row.cells[0].value = _childNameControllers[0].text;
+    row.cells[1].value = 'NGN ${_feeControllers[0].text}';
     // row.cells[1].value = 'NGN 0';
 
     // ROW 2 (Total Fee to be Paid)
     row = grid.rows.add();
-    row.cells[0].value = 'Total';
-    row.cells[1].value = 'NGN ${_fee.text}';
+    row.cells[0].value = 'Total Expected';
+    row.cells[1].value = 'NGN $totalExpected';
     // row.cells[1].value = 'NGN 0';
 
     // ROW 3 (Amount Paid currently)
@@ -119,23 +143,27 @@ class _FormScreenState extends State<FormScreen> {
     saveAndLaunchFile(bytes, '$parentName.pdf');
   }
 
-  List<TextEditingController> childrenControllers = [];
-  List<TextEditingController> feeControllers = [];
-  List<Widget> childrenFields = [];
+  // List<TextEditingController> childrenControllers = [];
+  // List<TextEditingController> feeControllers = [];
+  // List<int> childrenFields = [];
 
-  void _addControllers() {
-    childrenControllers.add(TextEditingController());
-    feeControllers.add(TextEditingController());
-  }
+  // void _addControllers() {
+  //   childrenControllers.insert(0, TextEditingController());
+  //   feeControllers.insert(0, TextEditingController());
+  //   debugPrint('_addControllers() called. Updated list:');
+  //   debugPrint('Children Controllers: ${childrenControllers.toString()}');
+  //   debugPrint('Fee Controllers: ${feeControllers.toString()}');
+  // }
 
-  void _addChildField() {
-    setState(() {
-      childrenFields.add(Container()); // adds an empty container to list
-    });
-    // Container is just a placeholder. It does nothing.
-    // It is basically just filling up the List to be able to keep count
-    // of number of elements in there.
-  }
+  // void _addChildField() {
+  //   setState(() {
+  //     childrenFields.add(1); // adds an empty container to list
+  //     debugPrint('Children Fields: ${childrenFields.toString()}');
+  //   });
+  //   // Container is just a placeholder. It does nothing.
+  //   // It is basically just filling up the List to be able to keep count
+  //   // of number of elements in there.
+  // }
 
   // void _addChildField() {
   //   childrenFields.add(Padding(
@@ -290,6 +318,7 @@ class _FormScreenState extends State<FormScreen> {
                       height: spacing,
                     ),
 
+                    // first child and fee
                     Row(
                       children: [
                         // child's name field
@@ -303,7 +332,7 @@ class _FormScreenState extends State<FormScreen> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: TextFormField(
-                                controller: _childName,
+                                controller: _childNameControllers[0],
                                 style: const TextStyle(
                                   fontSize: 20,
                                 ),
@@ -339,7 +368,7 @@ class _FormScreenState extends State<FormScreen> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: TextFormField(
-                                controller: _fee,
+                                controller: _feeControllers[0],
                                 cursorColor: kblack,
                                 keyboardType: TextInputType.number,
                                 style: const TextStyle(
@@ -359,7 +388,7 @@ class _FormScreenState extends State<FormScreen> {
                                   border: InputBorder.none,
                                 ),
                                 onChanged: (value) {
-                                  fee = value;
+                                  fee1 = value;
                                 },
                               ),
                             ),
@@ -368,82 +397,338 @@ class _FormScreenState extends State<FormScreen> {
                         // end of fee field
                       ],
                     ),
+                    //  end of first child and fee
 
                     const SizedBox(
                       height: spacing,
                     ),
 
-                    // what this should do is generate a list of fields
-                    // with a controllers for each field
-                    if (childrenFields.isNotEmpty)
-                      ListView.builder(
-                          padding: EdgeInsets.zero,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: childrenFields.length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            TextEditingController _childNameController =
-                                childrenControllers[index];
-                            TextEditingController _feeController =
-                                feeControllers[index];
-                            return ChildField(
-                              childNameController: _childNameController,
-                              feeController: _feeController,
-                              currentChildField: childrenFields.removeAt(index),
-                              currentChildNameController:
-                                  childrenControllers.removeAt(index),
-                              currentFeeController:
-                                  feeControllers.removeAt(index),
-                            );
-                          })
-                    else
-                      Container(),
-
-                    // Column(
-                    //   children: childrenFields,
-                    // ),
-
-                    const SizedBox(
-                      height: spacing,
-                    ),
-
-                    // add button
-                    SizedBox(
-                      width: 100,
-                      child: MaterialButton(
-                        onPressed: () {
-                          setState(() {
-                            _addChildField();
-                            _addControllers();
-                          });
-                        },
-                        color: Colors.redAccent,
-                        minWidth: 50,
-                        height: 40,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: Center(
-                          child: Row(
-                            children: const [
-                              Icon(
-                                Icons.add,
-                                color: kwhite,
+                    // second child and fee
+                    Row(
+                      children: [
+                        // child's name field
+                        Expanded(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              color: kLightGrey,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: TextFormField(
+                                controller: _childNameControllers[0],
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                ),
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  labelText: "Child's Name",
+                                  labelStyle: TextStyle(
+                                    color: kblack,
+                                  ),
+                                  floatingLabelStyle: TextStyle(
+                                    color: kblack,
+                                  ),
+                                  border: InputBorder.none,
+                                ),
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text('Add',
-                                  style: TextStyle(
-                                    color: kwhite,
-                                    fontSize: 20,
-                                  )),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                        // end of child's name field
+
+                        const SizedBox(
+                          width: spacing,
+                        ),
+
+                        // fee field
+                        Expanded(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              color: kLightGrey,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: TextFormField(
+                                controller: _feeControllers[1],
+                                cursorColor: kblack,
+                                keyboardType: TextInputType.number,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                ),
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  isDense: true,
+                                  prefixText: 'NGN ',
+                                  labelText: "Fee",
+                                  labelStyle: TextStyle(
+                                    color: kblack,
+                                  ),
+                                  floatingLabelStyle: TextStyle(
+                                    color: kblack,
+                                  ),
+                                  border: InputBorder.none,
+                                ),
+                                onChanged: (value) {
+                                  fee2 = value;
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                        // end of fee field
+                      ],
                     ),
-                    // end of add button
+                    // end of second child and fee
+
+                    const SizedBox(
+                      height: spacing,
+                    ),
+
+                    // fourth child and fee
+                    Row(
+                      children: [
+                        // child's name field
+                        Expanded(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              color: kLightGrey,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: TextFormField(
+                                controller: _childNameControllers[1],
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                ),
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  labelText: "Child's Name",
+                                  labelStyle: TextStyle(
+                                    color: kblack,
+                                  ),
+                                  floatingLabelStyle: TextStyle(
+                                    color: kblack,
+                                  ),
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        // end of child's name field
+
+                        const SizedBox(
+                          width: spacing,
+                        ),
+
+                        // fee field
+                        Expanded(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              color: kLightGrey,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: TextFormField(
+                                controller: _feeControllers[2],
+                                cursorColor: kblack,
+                                keyboardType: TextInputType.number,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                ),
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  isDense: true,
+                                  prefixText: 'NGN ',
+                                  labelText: "Fee",
+                                  labelStyle: TextStyle(
+                                    color: kblack,
+                                  ),
+                                  floatingLabelStyle: TextStyle(
+                                    color: kblack,
+                                  ),
+                                  border: InputBorder.none,
+                                ),
+                                onChanged: (value) {
+                                  fee3 = value;
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                        // end of fee field
+                      ],
+                    ),
+                    // end of third child and fee
+
+                    const SizedBox(
+                      height: spacing,
+                    ),
+
+                    // third child and fee
+                    Row(
+                      children: [
+                        // child's name field
+                        Expanded(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              color: kLightGrey,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: TextFormField(
+                                controller: _childNameControllers[2],
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                ),
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  labelText: "Child's Name",
+                                  labelStyle: TextStyle(
+                                    color: kblack,
+                                  ),
+                                  floatingLabelStyle: TextStyle(
+                                    color: kblack,
+                                  ),
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        // end of child's name field
+
+                        const SizedBox(
+                          width: spacing,
+                        ),
+
+                        // fee field
+                        Expanded(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              color: kLightGrey,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: TextFormField(
+                                controller: _feeControllers[3],
+                                cursorColor: kblack,
+                                keyboardType: TextInputType.number,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                ),
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  isDense: true,
+                                  prefixText: 'NGN ',
+                                  labelText: "Fee",
+                                  labelStyle: TextStyle(
+                                    color: kblack,
+                                  ),
+                                  floatingLabelStyle: TextStyle(
+                                    color: kblack,
+                                  ),
+                                  border: InputBorder.none,
+                                ),
+                                onChanged: (value) {
+                                  fee4 = value;
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                        // end of fee field
+                      ],
+                    ),
+                    // end of fourth child and fee
+
+                    const SizedBox(
+                      height: spacing,
+                    ),
+
+                    // // what this should do is generate a list of fields
+                    // // with a controllers for each field
+                    // if (childrenFields.isNotEmpty)
+                    //   ListView.builder(
+                    //       padding: EdgeInsets.zero,
+                    //       physics: const NeverScrollableScrollPhysics(),
+                    //       itemCount: childrenFields.length,
+                    //       shrinkWrap: true,
+                    //       itemBuilder: (context, index) {
+                    //         // TextEditingController _childNameController =
+                    //         //     childrenControllers[index];
+                    //         // TextEditingController _feeController =
+                    //         //     feeControllers[index];
+                    //         return ChildField(
+                    //           childNameController: childrenControllers[index],
+                    //           feeController: feeControllers[index],
+                    //           currentChildField: childrenFields.removeAt(index),
+                    //           currentChildNameController:
+                    //               childrenControllers.removeAt(index),
+                    //           currentFeeController:
+                    //               feeControllers.removeAt(index),
+                    //         );
+                    //       })
+                    // else
+                    //   Container(),
+
+                    // // Column(
+                    // //   children: childrenFields,
+                    // // ),
+
+                    // const SizedBox(
+                    //   height: spacing,
+                    // ),
+
+                    // // add button
+                    // SizedBox(
+                    //   width: 100,
+                    //   child: MaterialButton(
+                    //     onPressed: () {
+                    //       setState(() {
+                    //         _addChildField();
+                    //         _addControllers();
+                    //       });
+                    //     },
+                    //     color: Colors.redAccent,
+                    //     minWidth: 50,
+                    //     height: 40,
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(25),
+                    //     ),
+                    //     child: Center(
+                    //       child: Row(
+                    //         children: const [
+                    //           Icon(
+                    //             Icons.add,
+                    //             color: kwhite,
+                    //           ),
+                    //           SizedBox(
+                    //             width: 10,
+                    //           ),
+                    //           Text('Add',
+                    //               style: TextStyle(
+                    //                 color: kwhite,
+                    //                 fontSize: 20,
+                    //               )),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    // // end of add button
 
                     const SizedBox(
                       height: spacing,
@@ -494,28 +779,66 @@ class _FormScreenState extends State<FormScreen> {
           Center(
             child: MaterialButton(
               onPressed: () {
-                if (_fee.text.isNotEmpty || _totalPaid.text.isNotEmpty) {
-                  feeAsInt = int.parse(fee);
-                  totalPaidAsInt = int.parse(totalPaid);
+                if (_parentName.text.isEmpty) {
+                  showInSnackBar(context, 'Please type in the Parent\'s Name.');
+                } else if (_childNameControllers[0].text.isEmpty ||
+                    _feeControllers[0].text.isEmpty &&
+                        _childNameControllers[1].text.isEmpty ||
+                    _feeControllers[1].text.isEmpty &&
+                        _childNameControllers[2].text.isEmpty ||
+                    _feeControllers[2].text.isEmpty &&
+                        _childNameControllers[3].text.isEmpty ||
+                    _feeControllers[3].text.isEmpty) {
+                  showInSnackBar(
+                      context, 'At least one child and fee must be filled.');
+                } else if (_totalPaid.text.isEmpty) {
+                  showInSnackBar(context, 'Please fill in the total paid.');
                 } else {
-                  showInSnackBar(context, 'Please fill in all the fields');
-                }
-                if (_parentName.text.isEmpty ||
-                    _childName.text.isEmpty ||
-                    _fee.text.isEmpty ||
-                    _totalPaid.text.isEmpty) {
-                  showInSnackBar(context, 'Please fill in all the fields');
-                } else {
-                  if (totalPaidAsInt! > feeAsInt!) {
-                    showInSnackBar(context,
-                        'Total Paid cannot be greater than total fees.');
-                  } else {
-                    totalFee = feeAsInt;
-                    outstanding = (totalFee! - totalPaidAsInt!);
-                    todayDate = Jiffy(DateTime.now()).format('do MMM yyyy');
-                    _generateInvoice();
+                  // code below parses the filled in "fee" fields
+                  // as ints, then adds them to a list
+                  for (var element in _feeControllers) {
+                    if (element.text.isNotEmpty) {
+                      allFeesAsInt.add(int.parse(element.text));
+                    }
                   }
+                  totalPaidAsInt = int.parse(totalPaid);
+                  totalExpected = allFeesAsInt.fold(
+                      0, (previous, current) => previous! + current);
+                  // this adds all the members of the allFeesAsInt list
+
+                  // TODO: Run through the filled Child Name and Fees and add each set into a Map
+
+                  // for (var element in _childNameControllers) {
+                  //   if (element.text.isNotEmpty) {
+                  //     // nameAndFee![element.text] = ;
+                  //   }
+                  // }
+                  todayDate = Jiffy(DateTime.now()).format('do MMM yyyy');
+                  _generateInvoice();
                 }
+
+                // if (_fee.text.isNotEmpty || _totalPaid.text.isNotEmpty) {
+                //   feeAsInt = int.parse(fee);
+                //   totalPaidAsInt = int.parse(totalPaid);
+                // } else {
+                //   showInSnackBar(context, 'Please fill in all the fields');
+                // }
+                // if (_parentName.text.isEmpty ||
+                //     _childName.text.isEmpty ||
+                //     _fee.text.isEmpty ||
+                //     _totalPaid.text.isEmpty) {
+                //   showInSnackBar(context, 'Please fill in all the fields');
+                // } else {
+                //   if (totalPaidAsInt! > feeAsInt!) {
+                //     showInSnackBar(context,
+                //         'Total Paid cannot be greater than total fees.');
+                //   } else {
+                //     totalFee = feeAsInt;
+                //     outstanding = (totalFee! - totalPaidAsInt!);
+                //     todayDate = Jiffy(DateTime.now()).format('do MMM yyyy');
+                //     _generateInvoice();
+                //   }
+                // }
               },
               minWidth: double.infinity,
               height: 70,
