@@ -7,7 +7,7 @@ import 'package:invoice_generator/constants.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'mobile.dart';
 import 'package:jiffy/jiffy.dart';
-import 'package:quiver/iterables.dart';
+// import 'package:quiver/iterables.dart';
 
 class FormScreen extends StatefulWidget {
   const FormScreen({Key? key}) : super(key: key);
@@ -27,6 +27,8 @@ class _FormScreenState extends State<FormScreen> {
   int? totalPaidAsInt;
   int? totalFee;
   int? outstanding;
+  List<String> filledNames = [];
+  List<String> filledFees = [];
 
   final List<TextEditingController> _childNameControllers = [
     TextEditingController(),
@@ -111,10 +113,15 @@ class _FormScreenState extends State<FormScreen> {
     header.cells[0].value = _parentName.text;
     // header.cells[1].value = '';
 
-    // ROW 1 (Child Name / Fee)
-    PdfGridRow row = grid.rows.add();
-    row.cells[0].value = _childNameControllers[0].text;
-    row.cells[1].value = 'NGN ${_feeControllers[0].text}';
+    // ROWs for Child Names and Fees
+    PdfGridRow row;
+    for (var i = 0; i < filledNames.length; i++) {
+      row = grid.rows.add();
+      row.cells[0].value = filledNames[i];
+      row.cells[1].value = 'NGN ' + filledFees[i];
+    }
+    // row.cells[0].value = _childNameControllers[0].text;
+    // row.cells[1].value = 'NGN ${_feeControllers[0].text}';
     // row.cells[1].value = 'NGN 0';
 
     // ROW 2 (Total Fee to be Paid)
@@ -417,7 +424,7 @@ class _FormScreenState extends State<FormScreen> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: TextFormField(
-                                controller: _childNameControllers[0],
+                                controller: _childNameControllers[1],
                                 style: const TextStyle(
                                   fontSize: 20,
                                 ),
@@ -502,7 +509,7 @@ class _FormScreenState extends State<FormScreen> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: TextFormField(
-                                controller: _childNameControllers[1],
+                                controller: _childNameControllers[2],
                                 style: const TextStyle(
                                   fontSize: 20,
                                 ),
@@ -587,7 +594,7 @@ class _FormScreenState extends State<FormScreen> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: TextFormField(
-                                controller: _childNameControllers[2],
+                                controller: _childNameControllers[3],
                                 style: const TextStyle(
                                   fontSize: 20,
                                 ),
@@ -781,40 +788,50 @@ class _FormScreenState extends State<FormScreen> {
               onPressed: () {
                 if (_parentName.text.isEmpty) {
                   showInSnackBar(context, 'Please type in the Parent\'s Name.');
-                } else if (_childNameControllers[0].text.isEmpty ||
-                    _feeControllers[0].text.isEmpty &&
-                        _childNameControllers[1].text.isEmpty ||
-                    _feeControllers[1].text.isEmpty &&
-                        _childNameControllers[2].text.isEmpty ||
-                    _feeControllers[2].text.isEmpty &&
-                        _childNameControllers[3].text.isEmpty ||
-                    _feeControllers[3].text.isEmpty) {
-                  showInSnackBar(
-                      context, 'At least one child and fee must be filled.');
                 } else if (_totalPaid.text.isEmpty) {
                   showInSnackBar(context, 'Please fill in the total paid.');
                 } else {
+                  allFeesAsInt.clear();
+                  filledNames.clear();
+                  filledFees.clear();
+                  // makes sure the lists are empty before adding new values.
+                  // This is especially useful for when a user generates a PDF,
+                  // then goes back to make changes to the entered values.
+
                   // code below parses the filled in "fee" fields
                   // as ints, then adds them to a list
                   for (var element in _feeControllers) {
                     if (element.text.isNotEmpty) {
                       allFeesAsInt.add(int.parse(element.text));
+                      filledFees.add(element.text);
                     }
                   }
+
+                  // code below adds the filled in childName fields and
+                  // adds them to a list
+                  for (var element in _childNameControllers) {
+                    if (element.text.isNotEmpty) {
+                      filledNames.add(element.text);
+                    }
+                  }
+
                   totalPaidAsInt = int.parse(totalPaid);
                   totalExpected = allFeesAsInt.fold(
                       0, (previous, current) => previous! + current);
+                  outstanding = totalExpected! - totalPaidAsInt!;
                   // this adds all the members of the allFeesAsInt list
 
-                  // TODO: Run through the filled Child Name and Fees and add each set into a Map
-
-                  // for (var element in _childNameControllers) {
-                  //   if (element.text.isNotEmpty) {
-                  //     // nameAndFee![element.text] = ;
-                  //   }
-                  // }
                   todayDate = Jiffy(DateTime.now()).format('do MMM yyyy');
-                  _generateInvoice();
+                  if (totalPaidAsInt! > totalExpected!) {
+                    showInSnackBar(context,
+                        'Total Expected cannot be higher than Total Paid.');
+                  } else if (filledNames.length > filledFees.length) {
+                    showInSnackBar(context, 'Please fill in the missing fee.');
+                  } else if (filledNames.length < filledFees.length) {
+                    showInSnackBar(context, 'Please fill in the missing name.');
+                  } else {
+                    _generateInvoice();
+                  }
                 }
 
                 // if (_fee.text.isNotEmpty || _totalPaid.text.isNotEmpty) {
