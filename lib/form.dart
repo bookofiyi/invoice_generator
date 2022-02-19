@@ -3,11 +3,9 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
 import 'dart:typed_data';
 import 'package:invoice_generator/constants.dart';
-// import 'package:invoice_generator/elements/child_field.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'mobile.dart';
 import 'package:jiffy/jiffy.dart';
-// import 'package:quiver/iterables.dart';
 
 class FormScreen extends StatefulWidget {
   const FormScreen({Key? key}) : super(key: key);
@@ -83,8 +81,10 @@ class _FormScreenState extends State<FormScreen> {
     PdfDocument document = PdfDocument();
     final page = document.pages.add();
 
+    // logo
     page.graphics.drawImage(PdfBitmap(await _readImageData('logo.png')),
         const Rect.fromLTWH(0, 0, 100, 100));
+    // end of logo
 
     // Receipt text
     page.graphics.drawString('Receipt',
@@ -97,6 +97,17 @@ class _FormScreenState extends State<FormScreen> {
         todayDate, PdfStandardFont(PdfFontFamily.helvetica, 20),
         bounds: const Rect.fromLTRB(380, 25, 0, 0));
     // end of Date Issued text
+
+    // signature
+    page.graphics.drawImage(PdfBitmap(await _readImageData('signature.png')),
+        const Rect.fromLTWH(380, 550, 139, 76));
+    // end of signature
+
+    // Proprietress text
+    page.graphics.drawString(
+        'Proprietress', PdfStandardFont(PdfFontFamily.helvetica, 20),
+        bounds: const Rect.fromLTRB(405, 600, 0, 0));
+    // end of Proprietress text
 
     PdfGrid grid = PdfGrid();
     grid.style = PdfGridStyle(
@@ -111,7 +122,6 @@ class _FormScreenState extends State<FormScreen> {
     // header text
     PdfGridRow header = grid.headers[0];
     header.cells[0].value = _parentName.text;
-    // header.cells[1].value = '';
 
     // ROWs for Child Names and Fees
     PdfGridRow row;
@@ -120,27 +130,21 @@ class _FormScreenState extends State<FormScreen> {
       row.cells[0].value = filledNames[i];
       row.cells[1].value = 'NGN ' + filledFees[i];
     }
-    // row.cells[0].value = _childNameControllers[0].text;
-    // row.cells[1].value = 'NGN ${_feeControllers[0].text}';
-    // row.cells[1].value = 'NGN 0';
 
     // ROW 2 (Total Fee to be Paid)
     row = grid.rows.add();
     row.cells[0].value = 'Total Expected';
     row.cells[1].value = 'NGN $totalExpected';
-    // row.cells[1].value = 'NGN 0';
 
     // ROW 3 (Amount Paid currently)
     row = grid.rows.add();
     row.cells[0].value = 'Amount Paid';
     row.cells[1].value = 'NGN ${_totalPaid.text}';
-    // row.cells[1].value = 'NGN 0';
 
     // ROW 4 (Outstanding currently)
     row = grid.rows.add();
     row.cells[0].value = 'Outstanding';
     row.cells[1].value = 'NGN $outstanding';
-    // row.cells[1].value = 'NGN 0';
 
     grid.draw(page: page, bounds: const Rect.fromLTWH(0, 150, 0, 0));
 
