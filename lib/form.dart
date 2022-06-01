@@ -3,6 +3,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
 import 'dart:typed_data';
 import 'package:invoice_generator/constants.dart';
+import 'package:invoice_generator/settings.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'mobile.dart';
 import 'package:jiffy/jiffy.dart';
@@ -277,8 +278,13 @@ class _FormScreenState extends State<FormScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.folder, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Settings()),
+                );
+              },
+              icon: const Icon(Icons.settings, color: Colors.white),
             ),
           ),
         ],
