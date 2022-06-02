@@ -11,14 +11,24 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Settings',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: Column(
         children: [
           MaterialButton(
+            padding: EdgeInsets.zero,
             onPressed: () {},
             elevation: 0,
-            height: 50,
+            height: 70,
             minWidth: double.infinity,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 Text(
                   'Set Logo',
@@ -32,7 +42,6 @@ class _SettingsState extends State<Settings> {
                   'Set your company logo; displayed at top of receipt',
                   style: TextStyle(
                     fontSize: 15,
-                    fontWeight: FontWeight.bold,
                     color: Colors.grey,
                   ),
                 ),
