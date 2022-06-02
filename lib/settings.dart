@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoice_generator/set_logo.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -23,7 +24,12 @@ class _SettingsState extends State<Settings> {
         children: [
           MaterialButton(
             padding: EdgeInsets.zero,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const SetLogoScreen()));
+            },
             elevation: 0,
             height: 70,
             minWidth: double.infinity,
