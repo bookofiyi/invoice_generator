@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoice_generator/constants.dart';
 
 class SetLogoScreen extends StatefulWidget {
   const SetLogoScreen({Key? key}) : super(key: key);
@@ -26,17 +27,32 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
             Center(
               child: Image.asset(
                 'assets/images/logo.png',
-                width: 100,
-                height: 100,
+                width: 200,
+                height: 200,
               ),
             ),
-            MaterialButton(
-              onPressed: () {},
-              child: const Text('Set New Logo'),
+            const SizedBox(
+              height: 20,
             ),
             MaterialButton(
               onPressed: () {},
-              child: const Text('Remove Logo'),
+              child: const Text(
+                'Set New Logo',
+                style: TextStyle(
+                  color: kwhite,
+                ),
+              ),
+              color: kred,
+            ),
+            MaterialButton(
+              onPressed: () {},
+              child: const Text(
+                'Remove Logo',
+                style: TextStyle(
+                  color: kwhite,
+                ),
+              ),
+              color: kred,
             ),
           ],
         ),
