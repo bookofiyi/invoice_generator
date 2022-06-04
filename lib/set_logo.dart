@@ -20,26 +20,33 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
       source: ImageSource.gallery,
       maxHeight: 200,
       maxWidth: 200,
+      imageQuality: 100,
     );
     if (pickedFile != null) {
       setState(() {
         newImage = File(pickedFile!.path);
       });
+      showInSnackBar(context, 'New logo has been set.');
+    } else {
+      showInSnackBar(context, 'Error loading image. Try again.');
     }
   }
 
-  // Widget imageFromGallery() {
-  //   return FutureBuilder<File>(
-  //     builder: (BuildContext context, AsyncSnapshot<File?> snapshot) {
-  //       if (snapshot.connectionState == ConnectionState.done) {
-  //         if (snapshot.data == null) {
-  //           return const Text("Error loading file");
-  //         }
-  //       }
-  //         return Image.file(imageFile!);
-  //     },
-  //   );
-  // }
+  void showInSnackBar(context, String value) {
+    final snackBar = SnackBar(
+      content: Text(value),
+      backgroundColor: kred,
+      behavior: SnackBarBehavior.floating,
+      action: SnackBarAction(
+        label: 'DISMISS',
+        textColor: kwhite,
+        onPressed: () {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        },
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,14 +72,15 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
                     )
                   : Image.file(
                       newImage!,
-                      fit: BoxFit.cover,
                     ),
             ),
             const SizedBox(
               height: 20,
             ),
             MaterialButton(
-              onPressed: () => getImageFromGallery(),
+              onPressed: () {
+                getImageFromGallery();
+              },
               child: const Text(
                 'Set New Logo',
                 style: TextStyle(
@@ -82,7 +90,12 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
               color: kred,
             ),
             MaterialButton(
-              onPressed: () {},
+              onPressed: () {
+                setState(() {
+                  newImage = null;
+                });
+                showInSnackBar(context, 'Logo has been cleared.');
+              },
               child: const Text(
                 'Remove Logo',
                 style: TextStyle(
