@@ -77,6 +77,20 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
             const SizedBox(
               height: 20,
             ),
+            const Text(
+              'Recommended Image \nSpecifications',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+            const Text(
+              '200x200 PNG or 1:1 ratio image',
+            ),
+            const SizedBox(
+              height: 20,
+            ),
             MaterialButton(
               onPressed: () {
                 getImageFromGallery();
