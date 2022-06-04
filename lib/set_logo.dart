@@ -72,7 +72,7 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
               height: 20,
             ),
             MaterialButton(
-              onPressed: () {},
+              onPressed: () => getImageFromGallery(),
               child: const Text(
                 'Set New Logo',
                 style: TextStyle(
