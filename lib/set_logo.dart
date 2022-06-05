@@ -3,6 +3,8 @@ import 'package:invoice_generator/constants.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:invoice_generator/form.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 class SetLogoScreen extends StatefulWidget {
@@ -38,8 +40,11 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
 
   // stores the path of the image to persistent storage
   setPathAndState(String pickedFilePath) async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final fileName = basename(pickedFilePath);
+    // final savedImage = await newImage!.copy('${appDir.path}/$fileName');
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('imagePath', pickedFilePath);
+    prefs.setString('imagePath', '${appDir.path}/$fileName');
     prefs.setBool('imagePathSet', true);
   }
 
