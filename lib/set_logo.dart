@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:invoice_generator/constants.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:invoice_generator/form.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 
@@ -97,68 +98,95 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 32.0),
-        child: Column(
-          children: [
-            Center(
-              child: newImage == null
-                  ? Image.asset(
-                      'assets/images/logo.png',
-                      width: 200,
-                      height: 200,
-                    )
-                  : Image.file(
-                      newImage!,
+      body: Column(
+        children: [
+          Expanded(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 32.0),
+                  child: Center(
+                    child: newImage == null
+                        ? Image.asset(
+                            'assets/images/logo.png',
+                            width: 200,
+                            height: 200,
+                          )
+                        : Image.file(
+                            newImage!,
+                          ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                const Text(
+                  'Recommended Image \nSpecifications',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+                const Text(
+                  '200x200 PNG or 1:1 ratio image',
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                MaterialButton(
+                  onPressed: () {
+                    getImageFromGallery();
+                  },
+                  child: const Text(
+                    'Set New Logo',
+                    style: TextStyle(
+                      color: kwhite,
                     ),
+                  ),
+                  color: kred,
+                ),
+                MaterialButton(
+                  onPressed: () {
+                    setState(() {
+                      newImage = null;
+                      clearPathAndState();
+                    });
+                    showInSnackBar(context, 'Logo has been cleared.');
+                  },
+                  child: const Text(
+                    'Remove Logo',
+                    style: TextStyle(
+                      color: kwhite,
+                    ),
+                  ),
+                  color: kred,
+                ),
+              ],
             ),
-            const SizedBox(
-              height: 20,
-            ),
-            const Text(
-              'Recommended Image \nSpecifications',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-            const Text(
-              '200x200 PNG or 1:1 ratio image',
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            MaterialButton(
+          ),
+          Center(
+            child: MaterialButton(
               onPressed: () {
-                getImageFromGallery();
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const FormScreen()));
               },
+              minWidth: double.infinity,
+              height: 70,
+              elevation: 3,
+              color: kred,
               child: const Text(
-                'Set New Logo',
+                'Back to Home',
                 style: TextStyle(
+                  fontSize: 25,
                   color: kwhite,
                 ),
               ),
-              color: kred,
             ),
-            MaterialButton(
-              onPressed: () {
-                setState(() {
-                  newImage = null;
-                  clearPathAndState();
-                });
-                showInSnackBar(context, 'Logo has been cleared.');
-              },
-              child: const Text(
-                'Remove Logo',
-                style: TextStyle(
-                  color: kwhite,
-                ),
-              ),
-              color: kred,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

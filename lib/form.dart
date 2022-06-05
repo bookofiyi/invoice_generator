@@ -7,6 +7,7 @@ import 'package:invoice_generator/settings.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'mobile.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FormScreen extends StatefulWidget {
   const FormScreen({Key? key}) : super(key: key);
@@ -26,6 +27,7 @@ class _FormScreenState extends State<FormScreen> {
   int? totalPaidAsInt;
   int? totalFee;
   int? outstanding;
+  String? logoPath;
   List<String> filledNames = [];
   List<String> filledFees = [];
 
@@ -57,6 +59,20 @@ class _FormScreenState extends State<FormScreen> {
 
   String todayDate = '';
 
+  checkIfPathSet() async {
+    final prefs = await SharedPreferences.getInstance();
+    final imagePathSet = prefs.getBool('imagePathSet') ?? false;
+    if (imagePathSet == true) {
+      logoPath = prefs.getString('imagePath');
+    }
+  }
+
+  @override
+  void initState() {
+    checkIfPathSet();
+    super.initState();
+  }
+
   void showInSnackBar(context, String value) {
     final snackBar = SnackBar(
       content: Text(value),
@@ -73,8 +89,8 @@ class _FormScreenState extends State<FormScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  Future<Uint8List> _readImageData(String name) async {
-    final data = await rootBundle.load('assets/images/$name');
+  Future<Uint8List> _readImageData(String fullImagePath) async {
+    final data = await rootBundle.load(fullImagePath);
     return data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
   }
 
@@ -83,8 +99,14 @@ class _FormScreenState extends State<FormScreen> {
     final page = document.pages.add();
 
     // logo
-    page.graphics.drawImage(PdfBitmap(await _readImageData('logo.png')),
-        const Rect.fromLTWH(0, 0, 100, 100));
+    if (logoPath != null) {
+      page.graphics.drawImage(PdfBitmap(await _readImageData(logoPath!)),
+          const Rect.fromLTWH(0, 0, 100, 100));
+    } else {
+      page.graphics.drawImage(
+          PdfBitmap(await _readImageData('assets/images/logo.png')),
+          const Rect.fromLTWH(0, 0, 100, 100));
+    }
     // end of logo
 
     // Receipt text
@@ -100,7 +122,8 @@ class _FormScreenState extends State<FormScreen> {
     // end of Date Issued text
 
     // signature
-    page.graphics.drawImage(PdfBitmap(await _readImageData('signature.png')),
+    page.graphics.drawImage(
+        PdfBitmap(await _readImageData('assets/images/signature.png')),
         const Rect.fromLTWH(380, 550, 139, 76));
     // end of signature
 

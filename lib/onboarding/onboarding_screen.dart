@@ -24,7 +24,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: const EdgeInsets.only(bottom: 80),
+        padding: const EdgeInsets.only(bottom: 70),
         child: PageView(
           controller: controller, // allows working with the PageView
           onPageChanged: (index) {
@@ -77,7 +77,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 primary: Colors.white,
                 backgroundColor: Colors.red,
-                minimumSize: const Size.fromHeight(80),
+                minimumSize: const Size.fromHeight(70),
               ),
             )
           : Container(
