@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:invoice_generator/constants.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 
 class SetLogoScreen extends StatefulWidget {
@@ -12,8 +13,8 @@ class SetLogoScreen extends StatefulWidget {
 
 class _SetLogoScreenState extends State<SetLogoScreen> {
   XFile? pickedFile;
+  String? pickedFilePath;
   File? newImage;
-  String? path;
 
   getImageFromGallery() async {
     pickedFile = await ImagePicker().pickImage(
@@ -24,12 +25,28 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
     );
     if (pickedFile != null) {
       setState(() {
-        newImage = File(pickedFile!.path);
+        pickedFilePath = pickedFile!.path;
+        newImage = File(pickedFilePath!);
+        setPathAndState(pickedFilePath!);
       });
       showInSnackBar(context, 'New logo has been set.');
     } else {
       showInSnackBar(context, 'Error loading image. Try again.');
     }
+  }
+
+  // stores the path of the image to persistent storage
+  setPathAndState(String pickedFilePath) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('imagePath', pickedFilePath);
+    prefs.setBool('imagePathSet', true);
+  }
+
+  // clears the path of the image from persistent storage
+  clearPathAndState() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('imagePath', '');
+    prefs.setBool('imagePathSet', false);
   }
 
   void showInSnackBar(context, String value) {
@@ -46,6 +63,27 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
       ),
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  // on creation of the set_logo screen, checks if a logo is already
+  // set. If set, this sets the path of the pickedImage to the path
+  // of the image in local storage, thus displaying the set image.
+  // Otherwise, displays a placeholder image.
+  @override
+  void initState() {
+    checkIfPathSet();
+    super.initState();
+  }
+
+  checkIfPathSet() async {
+    final prefs = await SharedPreferences.getInstance();
+    final imagePathSet = prefs.getBool('imagePathSet') ?? false;
+    if (imagePathSet == true) {
+      pickedFilePath = prefs.getString('imagePath');
+      setState(() {
+        newImage = File(pickedFilePath!);
+      });
+    }
   }
 
   @override
@@ -107,6 +145,7 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
               onPressed: () {
                 setState(() {
                   newImage = null;
+                  clearPathAndState();
                 });
                 showInSnackBar(context, 'Logo has been cleared.');
               },
