@@ -32,9 +32,9 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
         newImage = File(pickedFilePath!);
         setPathAndState(pickedFilePath!);
       });
-      showInSnackBar(context, 'New logo has been set.');
+      showInSnackBar(this.context, 'New logo has been set.');
     } else {
-      showInSnackBar(context, 'Error loading image. Try again.');
+      showInSnackBar(this.context, 'Error loading image. Try again.');
     }
   }
 
@@ -64,11 +64,11 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
         label: 'DISMISS',
         textColor: kwhite,
         onPressed: () {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(this.context).hideCurrentSnackBar();
         },
       ),
     );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    ScaffoldMessenger.of(this.context).showSnackBar(snackBar);
   }
 
   // on creation of the set_logo screen, checks if a logo is already

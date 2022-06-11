@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
@@ -67,12 +69,6 @@ class _FormScreenState extends State<FormScreen> {
     }
   }
 
-  @override
-  void initState() {
-    checkIfPathSet();
-    super.initState();
-  }
-
   void showInSnackBar(context, String value) {
     final snackBar = SnackBar(
       content: Text(value),
@@ -100,8 +96,9 @@ class _FormScreenState extends State<FormScreen> {
 
     // logo
     if (logoPath != null) {
-      page.graphics.drawImage(PdfBitmap(await _readImageData(logoPath!)),
-          const Rect.fromLTWH(0, 0, 100, 100));
+      final Uint8List imageData = File(logoPath!).readAsBytesSync();
+      final PdfBitmap logo = PdfBitmap(imageData);
+      page.graphics.drawImage(logo, const Rect.fromLTWH(0, 0, 100, 100));
     } else {
       page.graphics.drawImage(
           PdfBitmap(await _readImageData('assets/images/logo.png')),
@@ -818,7 +815,7 @@ class _FormScreenState extends State<FormScreen> {
           ),
           Center(
             child: MaterialButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_parentName.text.isEmpty) {
                   showInSnackBar(context, 'Please type in the Parent\'s Name.');
                 } else if (_totalPaid.text.isEmpty) {
@@ -863,6 +860,7 @@ class _FormScreenState extends State<FormScreen> {
                   } else if (filledNames.length < filledFees.length) {
                     showInSnackBar(context, 'Please fill in the missing name.');
                   } else {
+                    await checkIfPathSet();
                     _generateInvoice();
                   }
                 }
