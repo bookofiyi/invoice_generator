@@ -86,9 +86,13 @@ class _SetLogoScreenState extends State<SetLogoScreen> {
     final imagePathSet = prefs.getBool('imagePathSet') ?? false;
     if (imagePathSet == true) {
       pickedFilePath = prefs.getString('imagePath');
-      setState(() {
-        newImage = File(pickedFilePath!);
-      });
+      if (0 == await File(pickedFilePath!).length()) {
+        prefs.setBool('imagePathSet', false);
+      } else {
+        setState(() {
+          newImage = File(pickedFilePath!);
+        });
+      }
     }
   }
 

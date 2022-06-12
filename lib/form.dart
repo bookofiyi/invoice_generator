@@ -100,6 +100,9 @@ class _FormScreenState extends State<FormScreen> {
       final PdfBitmap logo = PdfBitmap(imageData);
       page.graphics.drawImage(logo, const Rect.fromLTWH(0, 0, 100, 100));
     } else {
+      // temporary (final version should omit this else statement,
+      // thus leaving the logo position empty if no image has been
+      // set)
       page.graphics.drawImage(
           PdfBitmap(await _readImageData('assets/images/logo.png')),
           const Rect.fromLTWH(0, 0, 100, 100));
