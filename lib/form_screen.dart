@@ -240,42 +240,49 @@ class _FormScreenState extends State<FormScreen> {
           _addFields(),
 
           // total paid field
-          Container(
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: kLightGrey,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: TextFormField(
-                controller: _totalPaid,
-                cursorColor: kblack,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                style: const TextStyle(
-                  fontSize: 20,
-                  color: kblack,
-                ),
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.all(10.0),
-                  prefixText: 'NGN ',
-                  labelText: 'Total Paid',
-                  labelStyle: TextStyle(
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+            child: Container(
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: kLightGrey,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: TextFormField(
+                  controller: _totalPaid,
+                  cursorColor: kblack,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  style: const TextStyle(
+                    fontSize: 20,
                     color: kblack,
                   ),
-                  floatingLabelStyle: TextStyle(
-                    color: kblack,
+                  decoration: const InputDecoration(
+                    contentPadding: EdgeInsets.all(10.0),
+                    prefixText: 'NGN ',
+                    labelText: 'Total Paid',
+                    labelStyle: TextStyle(
+                      color: kblack,
+                    ),
+                    floatingLabelStyle: TextStyle(
+                      color: kblack,
+                    ),
+                    border: InputBorder.none,
                   ),
-                  border: InputBorder.none,
+                  onChanged: (value) {
+                    totalPaid = value;
+                  },
                 ),
-                onChanged: (value) {
-                  totalPaid = value;
-                },
               ),
             ),
           ),
           // end of total paid field
+
+          const SizedBox(
+            height: spacing,
+          ),
 
           Center(
             child: MaterialButton(

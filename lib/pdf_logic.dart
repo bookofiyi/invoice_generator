@@ -83,7 +83,7 @@ class PDFLogic {
     for (var i = 0; i < itemNames.length; i++) {
       row = grid.rows.add();
       row.cells[0].value = itemNames[i];
-      row.cells[1].value = 'NGN ' + fees[i];
+      row.cells[1].value = 'NGN ' + fees[i].toString();
     }
     // end of rows for item names and fees
 
