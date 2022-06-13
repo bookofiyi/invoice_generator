@@ -1,15 +1,28 @@
 import 'package:syncfusion_flutter_pdf/pdf.dart';
-import 'mobile.dart';
-import 'package:jiffy/jiffy.dart';
 import 'dart:typed_data';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import 'mobile.dart';
+
 class PDFLogic {
-  const PDFLogic({required this.todayDate, required this.customerName});
+  const PDFLogic({
+    required this.todayDate,
+    required this.customerName,
+    required this.itemNames,
+    required this.fees,
+    required this.totalExpected,
+    required this.totalPaid,
+    required this.outstanding,
+  });
 
   final String customerName;
   final String todayDate;
+  final int totalExpected;
+  final String totalPaid;
+  final int outstanding;
+  final List itemNames;
+  final List fees;
 
   Future<Uint8List> _readImageData(String fullImagePath) async {
     final data = await rootBundle.load(fullImagePath);
@@ -63,5 +76,39 @@ class PDFLogic {
     // header text
     PdfGridRow header = grid.headers[0];
     header.cells[0].value = customerName;
+    // end of header text
+
+    // Rows for item names and fees
+    PdfGridRow row;
+    for (var i = 0; i < itemNames.length; i++) {
+      row = grid.rows.add();
+      row.cells[0].value = itemNames[i];
+      row.cells[1].value = 'NGN ' + fees[i];
+    }
+    // end of rows for item names and fees
+
+    // Row for total fees expected
+    row = grid.rows.add();
+    row.cells[0].value = 'Total Expected';
+    row.cells[1].value = 'NGN $totalExpected';
+    // end of row for total fees expected
+
+    // Row for amount paid
+    row = grid.rows.add();
+    row.cells[0].value = 'Amount Paid';
+    row.cells[1].value = 'NGN $totalPaid';
+    // end of row for amount paid
+
+    // ROW 4 (Outstanding currently)
+    row = grid.rows.add();
+    row.cells[0].value = 'Outstanding';
+    row.cells[1].value = 'NGN $outstanding';
+
+    grid.draw(page: page, bounds: const Rect.fromLTWH(0, 150, 0, 0));
+
+    List<int> bytes = document.save();
+    document.dispose();
+
+    saveAndLaunchFile(bytes, '$customerName.pdf');
   }
 }

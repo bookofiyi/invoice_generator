@@ -328,6 +328,11 @@ class _FormScreenState extends State<FormScreen> {
                     PDFLogic pdf = PDFLogic(
                       customerName: customerName,
                       todayDate: todayDate,
+                      itemNames: itemNames,
+                      fees: fees,
+                      totalExpected: totalExpected!,
+                      totalPaid: _totalPaid.text,
+                      outstanding: outstanding!,
                     );
                     pdf.generateInvoice();
                   }
