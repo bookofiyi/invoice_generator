@@ -16,7 +16,7 @@ class PDFLogic {
     return data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
   }
 
-  Future<void> _generateInvoice() async {
+  Future<void> generateInvoice() async {
     PdfDocument document = PdfDocument();
     final page = document.pages.add();
 

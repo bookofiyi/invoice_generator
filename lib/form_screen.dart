@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:invoice_generator/constants.dart';
+import 'package:invoice_generator/pdf_logic.dart';
 import 'package:invoice_generator/settings.dart';
+import 'package:jiffy/jiffy.dart';
 
 class FormScreen extends StatefulWidget {
   const FormScreen({Key? key}) : super(key: key);
@@ -17,6 +19,15 @@ class _FormScreenState extends State<FormScreen> {
 
   final TextEditingController _customerName = TextEditingController();
   String customerName = '';
+  final TextEditingController _totalPaid = TextEditingController();
+  String totalPaid = '';
+  int? totalExpected;
+
+  List<String> itemNames = [];
+  List<int> fees = [];
+  String todayDate = '';
+  int? totalPaidAsInt;
+  int? outstanding;
 
   @override
   void dispose() {
@@ -145,6 +156,22 @@ class _FormScreenState extends State<FormScreen> {
         });
   }
 
+  void showInSnackBar(context, String value) {
+    final snackBar = SnackBar(
+      content: Text(value),
+      backgroundColor: kred,
+      behavior: SnackBarBehavior.floating,
+      action: SnackBarAction(
+        label: 'DISMISS',
+        textColor: kwhite,
+        onPressed: () {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        },
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -212,9 +239,100 @@ class _FormScreenState extends State<FormScreen> {
           ),
           _addFields(),
 
+          // total paid field
+          Container(
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              color: kLightGrey,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: TextFormField(
+                controller: _totalPaid,
+                cursorColor: kblack,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                style: const TextStyle(
+                  fontSize: 20,
+                  color: kblack,
+                ),
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.all(10.0),
+                  prefixText: 'NGN ',
+                  labelText: 'Total Paid',
+                  labelStyle: TextStyle(
+                    color: kblack,
+                  ),
+                  floatingLabelStyle: TextStyle(
+                    color: kblack,
+                  ),
+                  border: InputBorder.none,
+                ),
+                onChanged: (value) {
+                  totalPaid = value;
+                },
+              ),
+            ),
+          ),
+          // end of total paid field
+
           Center(
             child: MaterialButton(
-              onPressed: () {},
+              onPressed: () {
+                if (_customerName.text.isEmpty) {
+                  showInSnackBar(
+                      context, 'Please enter in the Customer\'s Name.');
+                } else if (_totalPaid.text.isEmpty) {
+                  showInSnackBar(context, 'Please enter the total paid.');
+                } else {
+                  // makes sure the lists are empty before adding new values.
+                  // This is especially useful for when a user generates a PDF,
+                  // then goes back to make changes to the entered values.
+                  itemNames.clear();
+                  fees.clear();
+                }
+
+                // adds content of non-empty text fields for item names and
+                // adds them to itemNames list
+                _itemControllers
+                    .where((element) => element.text != '')
+                    .forEach((element) {
+                  itemNames.add(element.text);
+                });
+
+                // converts content of non-empty text fields for fees to ints
+                // and adds them to fees list
+                _feeControllers
+                    .where((element) => element.text != '')
+                    .forEach((element) {
+                  fees.add(int.parse(element.text));
+
+                  totalPaidAsInt = int.parse(totalPaid);
+                  // sums up the fees expected to be paid
+                  totalExpected = fees.fold(
+                      0, (previousValue, current) => previousValue! + current);
+                  outstanding = totalExpected! - totalPaidAsInt!;
+
+                  todayDate = Jiffy(DateTime.now()).format('do MMM yyyy');
+
+                  if (totalPaidAsInt! > totalExpected!) {
+                    showInSnackBar(context,
+                        'Total Expected cannot be higher than Total Paid.');
+                  } else if (itemNames.length > fees.length) {
+                    showInSnackBar(context, 'Please fill in the missing fee.');
+                  } else if (itemNames.length < fees.length) {
+                    showInSnackBar(
+                        context, 'Please fill in the missing item name.');
+                  } else {
+                    PDFLogic pdf = PDFLogic(
+                      customerName: customerName,
+                      todayDate: todayDate,
+                    );
+                    pdf.generateInvoice();
+                  }
+                });
+              },
               minWidth: double.infinity,
               height: 70,
               elevation: 3,
