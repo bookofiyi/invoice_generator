@@ -211,7 +211,6 @@ class _FormScreenState extends State<FormScreen> {
             child: _listView(),
           ),
           _addFields(),
-          // _generateInvoiceButton(),
 
           Center(
             child: MaterialButton(
@@ -220,11 +219,13 @@ class _FormScreenState extends State<FormScreen> {
               height: 70,
               elevation: 3,
               color: kred,
-              child: const Text('Generate Invoice',
-                  style: TextStyle(
-                    fontSize: 25,
-                    color: kwhite,
-                  )),
+              child: const Text(
+                'Generate Invoice',
+                style: TextStyle(
+                  fontSize: 25,
+                  color: kwhite,
+                ),
+              ),
             ),
           ),
         ],
